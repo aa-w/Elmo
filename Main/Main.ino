@@ -94,7 +94,37 @@
 #define fifteen 18
 #define FIFTEENLENGTH 1000
 
-unsigned long DelayArray [19] = {0, SOMETHINGTOSAYLENGTH, LAUGHTERLENGTH, LOVEYOULENGTH, ONELENGTH, TWOLENGTH, THREELENGTH, FOURLENGTH, FIVELENGTH, SIXLENGTH, SEVENLENGTH, EIGHTLENGTH, NINELENGTH, TENLENGTH, ELEVENLENGTH, TWELVELENGTH, THIRTEENLENGTH, THIRTEENLENGTH, FOURTEENLENGTH, FIFTEENLENGTH};
+#define sixteen 19
+#define SIXTEENLENGTH 1000
+
+#define seventeen 20
+#define SEVENTEENLENGTH 1000
+
+#define eightteen 21
+#define EIGHTTEENLENGTH 1000
+
+#define nineteen 22
+#define NINETEENLENGTH 1000
+
+#define twenty 23
+#define TWENTYLENGTH 1000
+
+#define thirty 24
+#define THIRTYLENGTH 1000
+
+#define fourty 25
+#define FOURTYLENGTH 1000
+
+#define fifty 26
+#define FIFTYLENGTH 1000
+
+#define OCLOCK 27
+#define OCLOCKLENGTH 1000
+
+const unsigned long DelayArray [29] = {0, SOMETHINGTOSAYLENGTH, LAUGHTERLENGTH, LOVEYOULENGTH, ONELENGTH, TWOLENGTH, THREELENGTH, FOURLENGTH, FIVELENGTH, SIXLENGTH, SEVENLENGTH, EIGHTLENGTH, NINELENGTH, TENLENGTH, ELEVENLENGTH,
+                                       TWELVELENGTH, THIRTEENLENGTH, THIRTEENLENGTH, FOURTEENLENGTH, FIFTEENLENGTH, SIXTEENLENGTH, SEVENTEENLENGTH, EIGHTTEENLENGTH, NINETEENLENGTH, TWENTYLENGTH, THIRTYLENGTH, FOURTYLENGTH,
+                                       FIFTYLENGTH, OCLOCKLENGTH
+                                      };
 
 //Sound Play Control
 bool PlayTrigger = false;
@@ -380,6 +410,87 @@ unsigned char nextSampleLeft()
         return (unsigned char)((int)FIFTEENSamples[pos++] + 128);
       }
       break;
+    case sixteen:
+      {
+        if (pos >= SIXTEENOffsets[2])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)SIXTEENSamples[pos++] + 128);
+      }
+      break;
+    case seventeen:
+      {
+        if (pos >= SEVENTEENOffsets[2])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)SEVENTEENSamples[pos++] + 128);
+      }
+      break;
+    case eightteen:
+      {
+        if (pos >= EIGHTTEENOffsets[2])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)EIGHTTEENSamples[pos++] + 128);
+      }
+      break;
+    case nineteen:
+      {
+        if (pos >= NINETEENOffsets[2])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)NINETEENSamples[pos++] + 128);
+      }
+      break;
+    case twenty:
+      {
+        if (pos >= TWENTYOffsets[2])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)TWENTYSamples[pos++] + 128);
+      }
+      break;
+    case thirty:
+      {
+        if (pos >= THIRTYOffsets[2])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)THIRTYSamples[pos++] + 128);
+      }
+      break;
+    case fourty:
+      {
+        if (pos >= FOURTYOffsets[2])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)FOURTYSamples[pos++] + 128);
+      }
+      break;
+    case fifty:
+      {
+        if (pos >= FIFTYOffsets[2])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)FIFTYSamples[pos++] + 128);
+      }
+      break;
+    case OCLOCK:
+      {
+        if (pos >= OCLOCKOffsets[2])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)OCLOCKSamples[pos++] + 128);
+      }
+      break;
   }
 }
 
@@ -521,16 +632,16 @@ unsigned char nextSampleRight()
         return (unsigned char)((int)ELEVENSamples[pos++] + 128);
       }
       break;
-          case twelve:
+    case twelve:
       {
-        if (pos >= TWELEVEOffsets[1])
+        if (pos >= TWELVEOffsets[1])
         {
           pos = 0;
         }
         return (unsigned char)((int)TWELVESamples[pos++] + 128);
       }
       break;
-          case thirteen:
+    case thirteen:
       {
         if (pos >= THIRTEENOffsets[1])
         {
@@ -539,7 +650,7 @@ unsigned char nextSampleRight()
         return (unsigned char)((int)THIRTEENSamples[pos++] + 128);
       }
       break;
-          case fourteen:
+    case fourteen:
       {
         if (pos >= FOURTEENOffsets[1])
         {
@@ -548,13 +659,94 @@ unsigned char nextSampleRight()
         return (unsigned char)((int)FOURTEENSamples[pos++] + 128);
       }
       break;
-          case fifteen:
+    case fifteen:
       {
         if (pos >= FIFTEENOffsets[1])
         {
           pos = 0;
         }
         return (unsigned char)((int)FIFTEENSamples[pos++] + 128);
+      }
+      break;
+    case sixteen:
+      {
+        if (pos >= SIXTEENOffsets[1])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)SIXTEENSamples[pos++] + 128);
+      }
+      break;
+    case seventeen:
+      {
+        if (pos >= SEVENTEENOffsets[1])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)SEVENTEENSamples[pos++] + 128);
+      }
+      break;
+    case eightteen:
+      {
+        if (pos >= EIGHTTEENOffsets[1])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)EIGHTTEENSamples[pos++] + 128);
+      }
+      break;
+    case nineteen:
+      {
+        if (pos >= NINETEENOffsets[1])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)NINETEENSamples[pos++] + 128);
+      }
+      break;
+    case twenty:
+      {
+        if (pos >= TWENTYOffsets[1])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)TWENTYSamples[pos++] + 128);
+      }
+      break;
+    case thirty:
+      {
+        if (pos >= THIRTYOffsets[1])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)THIRTYSamples[pos++] + 128);
+      }
+      break;
+    case fourty:
+      {
+        if (pos >= FOURTYOffsets[1])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)FOURTYSamples[pos++] + 128);
+      }
+      break;
+    case fifty:
+      {
+        if (pos >= FIFTYOffsets[1])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)FIFTYSamples[pos++] + 128);
+      }
+      break;
+    case OCLOCK:
+      {
+        if (pos >= OCLOCKOffsets[1])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)OCLOCKSamples[pos++] + 128);
       }
       break;
   }
@@ -640,7 +832,10 @@ void setup()
   PlayTrigger = true;
 
 }
-
+byte HourTime = 0;
+byte MinuteTime = 0;
+byte PrevMinute = 0;
+bool TimeUpdated = false;
 //PlayTrigger = false
 void loop()
 {
@@ -652,97 +847,224 @@ void loop()
       displayInfo();
     }
   }
-  delay(200);
   yield();
-  //    PlayTrigger = true;
-  //    PlaySound(one, true);
-  //    PlayTrigger = true;
-  //    PlaySound(two, true);
-  //    PlayTrigger = true;
-  //    PlaySound(three, true);
-  //    PlayTrigger = true;
-  //    PlaySound(four, true);
-  //    PlayTrigger = true;
-  //    PlaySound(five, true);
-  //    PlayTrigger = true;
-  //    PlaySound(six, true);
-  //    PlayTrigger = true;
-  //    PlaySound(seven, true);
-  //    PlayTrigger = true;
-  //    PlaySound(eight, true);
-  //    PlayTrigger = true;
-  //    PlaySound(nine, true);
-  //    PlayTrigger = true;
-  //    PlaySound(ten, true);
-  //    delay(1000);
-  if (gps.time.second() < 11)
+
+  if(gps.time.minute() != PrevMinute)
   {
-    Serial.println(gps.time.second());
-    switch (gps.time.second())
+    TimeUpdated = false;
+  }
+  
+  if (TimeUpdated == false)
+  {
+    HourTime = gps.time.hour();
+    if (HourTime == 0)
     {
+      HourTime = 12;
+    }
+    ReadNumber(HourTime);
+
+    MinuteTime = gps.time.minute();
+    ReadNumber(MinuteTime);
+    TimeUpdated = true;
+    PrevMinute = MinuteTime;
+  }
+  
+}
+
+void ReadNumber(byte Tminute)
+{
+  if (Tminute < 20)
+  {
+    switch (Tminute)
+    {
+      case 0:
+        {
+          PlaySound(OCLOCK, true);
+        }
       case 1:
         {
-          PlayTrigger = true;
           PlaySound(one, true);
         }
         break;
       case 2:
         {
-          PlayTrigger = true;
           PlaySound(two, true);
         }
         break;
       case 3:
         {
-          PlayTrigger = true;
           PlaySound(three, true);
         }
         break;
       case 4:
         {
-          PlayTrigger = true;
           PlaySound(four, true);
         }
         break;
       case 5:
         {
-          PlayTrigger = true;
           PlaySound(five, true);
         }
         break;
       case 6:
         {
-          PlayTrigger = true;
           PlaySound(six, true);
         }
         break;
       case 7:
         {
-          PlayTrigger = true;
           PlaySound(seven, true);
         }
         break;
       case 8:
         {
-          PlayTrigger = true;
           PlaySound(eight, true);
         }
         break;
       case 9:
         {
-          PlayTrigger = true;
           PlaySound(nine, true);
         }
         break;
       case 10:
         {
-          PlayTrigger = true;
           PlaySound(ten, true);
+        }
+        break;
+      case 11:
+        {
+          PlaySound(eleven, true);
+        }
+        break;
+      case 12:
+        {
+          PlaySound(twelve, true);
+        }
+        break;
+      case 13:
+        {
+          PlaySound(thirty, true);
+        }
+        break;
+      case 14:
+        {
+          PlaySound(fourteen, true);
+        }
+        break;
+      case 15:
+        {
+          PlaySound(fifteen, true);
+        }
+        break;
+      case 16:
+        {
+          PlaySound(sixteen, true);
+        }
+        break;
+      case 17:
+        {
+          PlaySound(seventeen, true);
+        }
+        break;
+      case 18:
+        {
+          PlaySound(eightteen, true);
+        }
+        break;
+      case 19:
+        {
+          PlaySound(nineteen, true);
         }
         break;
     }
   }
+  else
+  {
+    byte SubNumber = Tminute;
+    if ((Tminute > 20) && (Tminute < 30))
+    {
+      PlayTrigger = true;
+      PlaySound(twenty, true);
+      SubNumber = SubNumber - 20;
+    }
+    else if ((Tminute > 30) && (Tminute < 40))
+    {
+      PlayTrigger = true;
+      PlaySound(thirty, true);
+      SubNumber = SubNumber - 30;
+    }
+    else if ((Tminute > 40) && (Tminute < 50))
+    {
+      PlayTrigger = true;
+      PlaySound(fourty, true);
+      SubNumber = SubNumber - 40;
+    } else if ((gps.time.minute() > 50) && (Tminute < 60))
+    {
+      PlayTrigger = true;
+      PlaySound(fifty, true);
+      SubNumber = SubNumber - 50;
+    }
 
+    PlayTrigger = true;
+    PlaySubNumber(SubNumber);
+  }
+}
+
+void PlaySubNumber(byte Number)
+{
+  switch (Number)
+  {
+    case 1:
+      {
+        PlaySound(one, true);
+      }
+      break;
+    case 2:
+      {
+        PlaySound(two, true);
+      }
+      break;
+    case 3:
+      {
+        PlaySound(three, true);
+      }
+      break;
+    case 4:
+      {
+        PlaySound(four, true);
+      }
+      break;
+    case 5:
+      {
+        PlaySound(five, true);
+      }
+      break;
+    case 6:
+      {
+        PlaySound(six, true);
+      }
+      break;
+    case 7:
+      {
+        PlaySound(seven, true);
+      }
+      break;
+    case 8:
+      {
+        PlaySound(eight, true);
+      }
+      break;
+    case 9:
+      {
+        PlaySound(nine, true);
+      }
+      break;
+    default:
+      {
+
+      }
+      break;
+  }
 }
 
 void displayInfo()
