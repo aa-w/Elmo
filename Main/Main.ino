@@ -8,6 +8,9 @@
 #include <soc/rtc.h>
 #include <math.h>
 
+#include <TinyGPSPlus.h>
+#include <SoftwareSerial.h>
+
 #include "Sounds.h"
 #include "numbers.h"
 /*
@@ -32,6 +35,10 @@
 
 */
 
+#define TXPIN 3
+#define RXPIN 2
+#define GPSBAUD 9600
+
 //Sound Key
 #define SOMETHINGTOSAY 1
 #define SOMETHINGTOSAYLENGTH 2000
@@ -49,7 +56,7 @@
 #define TWOLENGTH 800
 
 #define three 6
-#define THREELENGTH 1000
+#define THREELENGTH 1200
 
 #define four 7
 #define FOURLENGTH 1000
@@ -58,21 +65,36 @@
 #define FIVELENGTH 1000
 
 #define six 9
-#define SIZLENGTH 900
+#define SIXLENGTH 700
 
 #define seven 10
-#define SEVENLENGTH 1000
+#define SEVENLENGTH 800
 
 #define eight 11
-#define EIGHTLENGTH 1000
+#define EIGHTLENGTH 800
 
 #define nine 12
 #define NINELENGTH 1000
 
 #define ten 13
-#define TENLENGTH 1000
+#define TENLENGTH 800
 
-unsigned long DelayArray [14] = {0, SOMETHINGTOSAYLENGTH, LAUGHTERLENGTH, LOVEYOULENGTH, ONELENGTH, TWOLENGTH, THREELENGTH, FOURLENGTH, FIVELENGTH, SIXLENGTH, SEVENLENGTH, EIGHTLENGTH, NINELENGTH, TENLENGTH};
+#define eleven 14
+#define ELEVENLENGTH 1000
+
+#define twelve 15
+#define TWELVELENGTH 1000
+
+#define thirteen 16
+#define THIRTEENLENGTH 1000
+
+#define fourteen 17
+#define FOURTEENLENGTH 1000
+
+#define fifteen 18
+#define FIFTEENLENGTH 1000
+
+unsigned long DelayArray [19] = {0, SOMETHINGTOSAYLENGTH, LAUGHTERLENGTH, LOVEYOULENGTH, ONELENGTH, TWOLENGTH, THREELENGTH, FOURLENGTH, FIVELENGTH, SIXLENGTH, SEVENLENGTH, EIGHTLENGTH, NINELENGTH, TENLENGTH, ELEVENLENGTH, TWELVELENGTH, THIRTEENLENGTH, THIRTEENLENGTH, FOURTEENLENGTH, FIFTEENLENGTH};
 
 //Sound Play Control
 bool PlayTrigger = false;
@@ -92,6 +114,9 @@ const int indexAddress = opcodeCount;
 const int bufferStart = indexAddress + 1;
 int currentSample = RTC_SLOW_MEM[indexAddress] & 0xffff;
 
+//SoftwareSerial GPSSerial(RXPIN, TXPIN);
+TinyGPSPlus gps;
+SoftwareSerial GPSSerial(33, 13);
 TaskHandle_t TaskHandle_1;
 
 void startULPSound() {
@@ -310,6 +335,51 @@ unsigned char nextSampleLeft()
         return (unsigned char)((int)TENSamples[pos++] + 128);
       }
       break;
+    case eleven:
+      {
+        if (pos >= ELEVENOffsets[2])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)ELEVENSamples[pos++] + 128);
+      }
+      break;
+    case twelve:
+      {
+        if (pos >= TWELVEOffsets[2])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)TWELVESamples[pos++] + 128);
+      }
+      break;
+    case thirteen:
+      {
+        if (pos >= THIRTEENOffsets[2])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)THIRTEENSamples[pos++] + 128);
+      }
+      break;
+    case fourteen:
+      {
+        if (pos >= FOURTEENOffsets[2])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)FOURTEENSamples[pos++] + 128);
+      }
+      break;
+    case fifteen:
+      {
+        if (pos >= TENOffsets[2])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)FIFTEENSamples[pos++] + 128);
+      }
+      break;
   }
 }
 
@@ -415,7 +485,7 @@ unsigned char nextSampleRight()
         return (unsigned char)((int)SEVENSamples[pos++] + 128);
       }
       break;
-      case eight:
+    case eight:
       {
         if (pos >= EIGHTOffsets[1])
         {
@@ -424,7 +494,7 @@ unsigned char nextSampleRight()
         return (unsigned char)((int)EIGHTSamples[pos++] + 128);
       }
       break;
-      case nine:
+    case nine:
       {
         if (pos >= NINEOffsets[1])
         {
@@ -433,13 +503,58 @@ unsigned char nextSampleRight()
         return (unsigned char)((int)NINESamples[pos++] + 128);
       }
       break;
-      case ten:
+    case ten:
       {
         if (pos >= TENOffsets[1])
         {
           pos = 0;
         }
         return (unsigned char)((int)TENSamples[pos++] + 128);
+      }
+      break;
+    case eleven:
+      {
+        if (pos >= ELEVENOffsets[1])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)ELEVENSamples[pos++] + 128);
+      }
+      break;
+          case twelve:
+      {
+        if (pos >= TWELEVEOffsets[1])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)TWELVESamples[pos++] + 128);
+      }
+      break;
+          case thirteen:
+      {
+        if (pos >= THIRTEENOffsets[1])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)THIRTEENSamples[pos++] + 128);
+      }
+      break;
+          case fourteen:
+      {
+        if (pos >= FOURTEENOffsets[1])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)FOURTEENSamples[pos++] + 128);
+      }
+      break;
+          case fifteen:
+      {
+        if (pos >= FIFTEENOffsets[1])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)FIFTEENSamples[pos++] + 128);
       }
       break;
   }
@@ -481,7 +596,7 @@ void PlaySound(byte SoundSelection, bool LoopLogic)
     dac_output_enable(DAC_CHANNEL_2);
     SelectedSound = SoundSelection;
     Serial.println(DelayArray[SoundSelection]);
-    SoundTrigger = millis() + DelaySelector(DelayArray[SoundSelection]);
+    SoundTrigger = millis() + DelayArray[SoundSelection];
     xTaskCreatePinnedToCore(sound_task, "sound task", 1024 * 6, NULL, 2, NULL, 1); //Assign a new task
     //startULPSound(); //Restart the sound routine
     StartLeft = true;
@@ -511,6 +626,7 @@ void PlaySound(byte SoundSelection, bool LoopLogic)
   }
 }
 
+
 void setup()
 {
   Serial.begin(115200);
@@ -518,6 +634,9 @@ void setup()
   Serial.print("Total stereo samples :");
   Serial.print("Buffer length: ");
   Serial.println((float)totalSampleWords / samplingRate, 3);
+
+  GPSSerial.begin(GPSBAUD); //9600
+
   PlayTrigger = true;
 
 }
@@ -525,7 +644,154 @@ void setup()
 //PlayTrigger = false
 void loop()
 {
-  PlayTrigger = false;
-  PlaySound(LAUGHTER, false);
+  while (GPSSerial.available() > 0)
+  {
+    //Serial.print(char(GPSSerial.read()));
+    if (gps.encode(GPSSerial.read()))
+    {
+      displayInfo();
+    }
+  }
+  delay(200);
+  yield();
+  //    PlayTrigger = true;
+  //    PlaySound(one, true);
+  //    PlayTrigger = true;
+  //    PlaySound(two, true);
+  //    PlayTrigger = true;
+  //    PlaySound(three, true);
+  //    PlayTrigger = true;
+  //    PlaySound(four, true);
+  //    PlayTrigger = true;
+  //    PlaySound(five, true);
+  //    PlayTrigger = true;
+  //    PlaySound(six, true);
+  //    PlayTrigger = true;
+  //    PlaySound(seven, true);
+  //    PlayTrigger = true;
+  //    PlaySound(eight, true);
+  //    PlayTrigger = true;
+  //    PlaySound(nine, true);
+  //    PlayTrigger = true;
+  //    PlaySound(ten, true);
+  //    delay(1000);
+  if (gps.time.second() < 11)
+  {
+    Serial.println(gps.time.second());
+    switch (gps.time.second())
+    {
+      case 1:
+        {
+          PlayTrigger = true;
+          PlaySound(one, true);
+        }
+        break;
+      case 2:
+        {
+          PlayTrigger = true;
+          PlaySound(two, true);
+        }
+        break;
+      case 3:
+        {
+          PlayTrigger = true;
+          PlaySound(three, true);
+        }
+        break;
+      case 4:
+        {
+          PlayTrigger = true;
+          PlaySound(four, true);
+        }
+        break;
+      case 5:
+        {
+          PlayTrigger = true;
+          PlaySound(five, true);
+        }
+        break;
+      case 6:
+        {
+          PlayTrigger = true;
+          PlaySound(six, true);
+        }
+        break;
+      case 7:
+        {
+          PlayTrigger = true;
+          PlaySound(seven, true);
+        }
+        break;
+      case 8:
+        {
+          PlayTrigger = true;
+          PlaySound(eight, true);
+        }
+        break;
+      case 9:
+        {
+          PlayTrigger = true;
+          PlaySound(nine, true);
+        }
+        break;
+      case 10:
+        {
+          PlayTrigger = true;
+          PlaySound(ten, true);
+        }
+        break;
+    }
+  }
 
+}
+
+void displayInfo()
+{
+  Serial.print(F("Location: "));
+  if (gps.location.isValid())
+  {
+    Serial.print(gps.location.lat(), 6);
+    Serial.print(F(","));
+    Serial.print(gps.location.lng(), 6);
+  }
+  else
+  {
+    Serial.print(F("INVALID"));
+  }
+
+  Serial.print(F("  Date/Time: "));
+  if (gps.date.isValid())
+  {
+    Serial.print(gps.date.month());
+    Serial.print(F("/"));
+    Serial.print(gps.date.day());
+    Serial.print(F("/"));
+    Serial.print(gps.date.year());
+  }
+  else
+  {
+    Serial.print(F("INVALID"));
+  }
+
+  Serial.print(F(" "));
+  if (gps.time.isValid())
+  {
+    if (gps.time.hour() < 10) Serial.print(F("0"));
+    Serial.print(gps.time.hour());
+    Serial.print(F(":"));
+    if (gps.time.minute() < 10) Serial.print(F("0"));
+    Serial.print(gps.time.minute());
+    Serial.print(F(":"));
+    if (gps.time.second() < 10) Serial.print(F("0"));
+    Serial.print(gps.time.second());
+    Serial.print(F("."));
+    if (gps.time.centisecond() < 10) Serial.print(F("0"));
+    Serial.print(gps.time.centisecond());
+  }
+  else
+  {
+    Serial.print(F("INVALID"));
+  }
+
+  Serial.println();
 }
