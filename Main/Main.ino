@@ -9,7 +9,7 @@
 #include <math.h>
 
 #include "Sounds.h"
-
+#include "numbers.h"
 /*
    SOUND SELECTION INDEX
    1 - SOMETHINGTOSAY
@@ -17,9 +17,14 @@
    3 - LOVEYOU
    4 - one
    5 - two
-   6 - THREE
-   7 - FOUR
-   8 - FIVE
+   6 - three
+   7 - four
+   8 - five
+   9 - six
+   10 - seven
+   11 - eight
+   12 - nine
+   13 - ten
 
 
 
@@ -42,6 +47,32 @@
 
 #define two 5
 #define TWOLENGTH 800
+
+#define three 6
+#define THREELENGTH 1000
+
+#define four 7
+#define FOURLENGTH 1000
+
+#define five 8
+#define FIVELENGTH 1000
+
+#define six 9
+#define SIZLENGTH 900
+
+#define seven 10
+#define SEVENLENGTH 1000
+
+#define eight 11
+#define EIGHTLENGTH 1000
+
+#define nine 12
+#define NINELENGTH 1000
+
+#define ten 13
+#define TENLENGTH 1000
+
+unsigned long DelayArray [14] = {0, SOMETHINGTOSAYLENGTH, LAUGHTERLENGTH, LOVEYOULENGTH, ONELENGTH, TWOLENGTH, THREELENGTH, FOURLENGTH, FIVELENGTH, SIXLENGTH, SEVENLENGTH, EIGHTLENGTH, NINELENGTH, TENLENGTH};
 
 //Sound Play Control
 bool PlayTrigger = false;
@@ -156,12 +187,12 @@ void startULPSound() {
 unsigned char nextSampleLeft()
 {
   static long pos = 0;
-  if(StartLeft == true)
+  if (StartLeft == true)
   {
     pos = 0;
     StartLeft = false;
   }
-  
+
   switch (SelectedSound)
   {
     case SOMETHINGTOSAY:
@@ -207,6 +238,77 @@ unsigned char nextSampleLeft()
         }
         return (unsigned char)((int)TWOSamples[pos++] + 128);
       }
+    case three:
+      {
+        if (pos >= THREEOffsets[2])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)THREESamples[pos++] + 128);
+      }
+      break;
+    case four:
+      {
+        if (pos >= FOUROffsets[2])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)FOURSamples[pos++] + 128);
+      }
+      break;
+    case five:
+      {
+        if (pos >= FIVEOffsets[2])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)FIVESamples[pos++] + 128);
+      }
+      break;
+    case six:
+      {
+        if (pos >= SIXOffsets[2])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)SIXSamples[pos++] + 128);
+      }
+      break;
+    case seven:
+      {
+        if (pos >= SEVENOffsets[2])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)SEVENSamples[pos++] + 128);
+      }
+      break;
+    case eight:
+      {
+        if (pos >= EIGHTOffsets[2])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)EIGHTSamples[pos++] + 128);
+      }
+      break;
+    case nine:
+      {
+        if (pos >= NINEOffsets[2])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)NINESamples[pos++] + 128);
+      }
+      break;
+    case ten:
+      {
+        if (pos >= TENOffsets[2])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)TENSamples[pos++] + 128);
+      }
       break;
   }
 }
@@ -215,12 +317,12 @@ unsigned char nextSampleLeft()
 unsigned char nextSampleRight()
 {
   static long pos = 0;
-  if(StartRight == true) //If we're at the start of the sound set the array pos to 0
+  if (StartRight == true) //If we're at the start of the sound set the array pos to 0
   {
     pos = 0;
     StartRight = false;
   }
-  
+
   switch (SelectedSound)
   {
     case SOMETHINGTOSAY:
@@ -268,9 +370,80 @@ unsigned char nextSampleRight()
         return (unsigned char)((int)TWOSamples[pos++] + 128);
       }
       break;
+    case three:
+      {
+        if (pos >= THREEOffsets[1])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)THREESamples[pos++] + 128);
+      }
+      break;
+    case four:
+      {
+        if (pos >= FOUROffsets[1])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)FOURSamples[pos++] + 128);
+      }
+      break;
+    case five:
+      {
+        if (pos >= FIVEOffsets[1])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)FIVESamples[pos++] + 128);
+      }
+      break;
+    case six:
+      {
+        if (pos >= SIXOffsets[1])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)SIXSamples[pos++] + 128);
+      }
+      break;
+    case seven:
+      {
+        if (pos >= SEVENOffsets[1])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)SEVENSamples[pos++] + 128);
+      }
+      break;
+      case eight:
+      {
+        if (pos >= EIGHTOffsets[1])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)EIGHTSamples[pos++] + 128);
+      }
+      break;
+      case nine:
+      {
+        if (pos >= NINEOffsets[1])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)NINESamples[pos++] + 128);
+      }
+      break;
+      case ten:
+      {
+        if (pos >= TENOffsets[1])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)TENSamples[pos++] + 128);
+      }
+      break;
   }
 }
-
 
 int lastFilledWord = 0;
 
@@ -280,7 +453,6 @@ void sound_task(void *pvParameters)
 
   while (1)
   {
-
     int currentSample = RTC_SLOW_MEM[indexAddress] & 0xffff;
     int currentWord = currentSample >> 1;
 
@@ -301,43 +473,6 @@ void sound_task(void *pvParameters)
   vTaskDelete(NULL);
 }
 
-long DelaySelector(byte SoundSelection)
-{
-  switch (SoundSelection)
-  {
-    case SOMETHINGTOSAY:
-      {
-        return SOMETHINGTOSAYLENGTH;
-      }
-      break;
-    case LAUGHTER:
-      {
-        return LAUGHTERLENGTH;
-      }
-      break;
-    case LOVEYOU:
-      {
-        return LOVEYOULENGTH;
-      }
-      break;
-    case one:
-      {
-        return ONELENGTH;
-      }
-      break;
-    case two:
-      {
-        return TWOLENGTH;
-      }
-      break;
-    default:
-      {
-        return 0;
-      }
-  }
-}
-
-
 void PlaySound(byte SoundSelection, bool LoopLogic)
 {
   if (PlayTrigger == true) //puts play time on to the clock
@@ -345,8 +480,8 @@ void PlaySound(byte SoundSelection, bool LoopLogic)
     dac_output_enable(DAC_CHANNEL_1);
     dac_output_enable(DAC_CHANNEL_2);
     SelectedSound = SoundSelection;
-    Serial.println(DelaySelector(SoundSelection));
-    SoundTrigger = millis() + DelaySelector(SoundSelection);
+    Serial.println(DelayArray[SoundSelection]);
+    SoundTrigger = millis() + DelaySelector(DelayArray[SoundSelection]);
     xTaskCreatePinnedToCore(sound_task, "sound task", 1024 * 6, NULL, 2, NULL, 1); //Assign a new task
     //startULPSound(); //Restart the sound routine
     StartLeft = true;
@@ -383,68 +518,14 @@ void setup()
   Serial.print("Total stereo samples :");
   Serial.print("Buffer length: ");
   Serial.println((float)totalSampleWords / samplingRate, 3);
-
-  //static uint8_t ucParameterToPass;
-  //TaskHandle_t xHandle = NULL;
-  //  xTaskCreatePinnedToCore(sound_task, "sound task", 1024 * 6, NULL, 2, NULL, 1);
-  //  delay(SOMETHINGTOSAY);
-  //  dac_output_disable(DAC_CHANNEL_1);
-  //  dac_output_disable(DAC_CHANNEL_2);
-  //  vTaskDelete(TaskHandle_1);
-
-  //REG_CLR_BIT(RTC_CNTL_STATE0_REG, RTC_CNTL_ULP_CP_SLP_TIMER_EN);
-  //delay(10000);
   PlayTrigger = true;
 
 }
-unsigned long StateTimer = millis() + 5000;
-byte state = 0;
+
 //PlayTrigger = false
 void loop()
 {
-
-  Serial.println((StateTimer - millis()));
-  Serial.println(state);
-  if (millis() > StateTimer)
-  {
-    state++;
-    Serial.println(state);
-    StateTimer = millis() + 5000;
-    PlayTrigger = true;
-    if (state > 4)
-    {
-      state = 0;
-    }
-  }
-  switch (state)
-  {
-    case 0:
-      {
-
-        PlaySound(one, false); //true loop until done, false dont
-      }
-      break;
-    case 1:
-      {
-        PlaySound(two, false);
-      }
-      break;
-    case 2:
-      {
-        PlaySound(LAUGHTER, false);
-      }
-      break;
-    case 3:
-      {
-        PlaySound(LOVEYOU, false);
-      }
-      break;
-    case 4:
-      {
-        delay(1000);
-        state = 0;
-      }
-      break;
-  }
+  PlayTrigger = false;
+  PlaySound(LAUGHTER, false);
 
 }
