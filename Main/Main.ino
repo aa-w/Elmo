@@ -125,14 +125,16 @@
 #define TIMEISLENGTH 1400
 
 #define NOTIME 29
-#define NOTIMELENGTH 6000
+#define NOTIMELENGTH 3000
 
+#define STOPLAUGH 30
+#define STOPLAUGHLENGTH 1500
 
 #define TIMEINVALIDTRIGGERVALUE 3600000
 
 const unsigned long DelayArray [31] = {0, SOMETHINGTOSAYLENGTH, LAUGHTERLENGTH, LOVEYOULENGTH, ONELENGTH, TWOLENGTH, THREELENGTH, FOURLENGTH, FIVELENGTH, SIXLENGTH, SEVENLENGTH, EIGHTLENGTH, NINELENGTH, TENLENGTH, ELEVENLENGTH,
                                        TWELVELENGTH, THIRTEENLENGTH, THIRTEENLENGTH, FOURTEENLENGTH, FIFTEENLENGTH, SIXTEENLENGTH, SEVENTEENLENGTH, EIGHTTEENLENGTH, NINETEENLENGTH, TWENTYLENGTH, THIRTYLENGTH, FOURTYLENGTH,
-                                       FIFTYLENGTH, OCLOCKLENGTH, TIMEISLENGTH, NOTIME
+                                       FIFTYLENGTH, OCLOCKLENGTH, TIMEISLENGTH, NOTIMELENGTH, STOPLAUGHLENGTH
                                       };
 
 //Sound Play Control
@@ -897,7 +899,7 @@ void loop()
   if (ValidTime == true)
   {
     TimeInvalidTrigger = false;
-    if (((gps.time.minute() == 59) && (gps.time.second() > 55))  || (Serial.available() > 0))
+    if (((gps.time.minute() == 0) && (gps.time.second() > 2))  || (Serial.available() > 0))
     {
       byte HourValue = gps.time.hour();
       HourChime(HourValue);
@@ -922,66 +924,31 @@ void loop()
       }
     }
   }
-
-
-  //  //erial.println(PrevMinute);
-  //  if (gps.time.minute() != PrevMinute)
-  //  {
-  //    TimeUpdated = false;
-  //  }
-  //
-  //  if (TimeUpdated == false)
-  //  {
-  //    HourTime = gps.time.hour();
-  //    if (HourTime == 0)
-  //    {
-  //      HourTime = 12;
-  //    }
-  //
-  //    PlayTrigger = true;
-  //    ReadNumber(HourTime);
-  //
-  //    MinuteTime = gps.time.minute();
-  //    PlayTrigger = true;
-  //    ReadNumber(MinuteTime);
-  //    TimeUpdated = true;
-  //    PrevMinute = MinuteTime;
-  //  }
-  //  char InputBuffer [20];
-  //  while (Serial.available() > 0)
-  //  {
-  //    //char(Serial.read());
-  //    strcpy(InputBuffer,char(Serial.read()));
-  //    //byte InputValue;
-  //    //InputValue = atoi(char(Serial.read()));
-  //    Serial.println(InputBuffer);
-  //byte atoi(char(Serial.read()))
-
-
 }
 
 void HourChime(byte HourValue) //Little Elmo Chimes on the hour
 {
   PlayTrigger = true;
-  unsigned long Timer = millis() + 1000;
+  unsigned long Timer = millis() + 2000;
   while (Timer > millis()) //Time for Elmo to standup
   {
     StandUp(true);
     PlaySound(SOMETHINGTOSAY, false);
   }
-
+  PlaySound(SOMETHINGTOSAY, true);
+  
   PlayTrigger = true;
-  Timer = millis() + 1000;
+  Timer = millis() + 2000;
+  
   while (Timer > millis()) //Time for Elmo to standup
   {
     ArmUp(true);
-    PlaySound(SOMETHINGTOSAY, false);
   }
 
-  delay(400);
   PlayTrigger = true;
   PlaySound(TIMEIS, true);
-
+  delay(500);
+  
   if (HourValue == 0)
   {
     ReadNumber(12);
@@ -1000,7 +967,7 @@ void HourChime(byte HourValue) //Little Elmo Chimes on the hour
   PlaySound(OCLOCK, true);
 
   
-  Timer = millis() + 3000;
+  Timer = millis() + 2000;
   while (Timer > millis()) //Time for Elmo to standup
   {
     ArmUp(false);
@@ -1008,13 +975,11 @@ void HourChime(byte HourValue) //Little Elmo Chimes on the hour
 
   Texture();
   
-  Timer = millis() + 3000;
+  Timer = millis() + 2000;
   while (Timer > millis()) //Time for Elmo to standup
   {
     StandUp(false);
-  }
-
-  
+  }  
 }
 
 void Texture()
@@ -1042,12 +1007,12 @@ void Texture()
   }
 }
 
-void StandUp(bool UpDown)
+void StandUp(bool UpDown) 
 {
 
 }
 
-void ArmUp(bool UpDown)
+void ArmUp(bool UpDown) //arm movement true = up
 {
 
 }
