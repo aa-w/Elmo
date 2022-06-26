@@ -68,16 +68,16 @@
 #define SIXLENGTH 700
 
 #define seven 10
-#define SEVENLENGTH 800
+#define SEVENLENGTH 700
 
 #define eight 11
-#define EIGHTLENGTH 800
+#define EIGHTLENGTH 700
 
 #define nine 12
-#define NINELENGTH 1000
+#define NINELENGTH 900
 
 #define ten 13
-#define TENLENGTH 800
+#define TENLENGTH 700
 
 #define eleven 14
 #define ELEVENLENGTH 1000
@@ -86,7 +86,7 @@
 #define TWELVELENGTH 1000
 
 #define thirteen 16
-#define THIRTEENLENGTH 1000
+#define THIRTEENLENGTH 800
 
 #define fourteen 17
 #define FOURTEENLENGTH 1000
@@ -107,13 +107,13 @@
 #define NINETEENLENGTH 1000
 
 #define twenty 23
-#define TWENTYLENGTH 1000
+#define TWENTYLENGTH 900
 
 #define thirty 24
 #define THIRTYLENGTH 1000
 
 #define fourty 25
-#define FOURTYLENGTH 1000
+#define FOURTYLENGTH 700
 
 #define fifty 26
 #define FIFTYLENGTH 1000
@@ -121,9 +121,18 @@
 #define OCLOCK 27
 #define OCLOCKLENGTH 1000
 
-const unsigned long DelayArray [29] = {0, SOMETHINGTOSAYLENGTH, LAUGHTERLENGTH, LOVEYOULENGTH, ONELENGTH, TWOLENGTH, THREELENGTH, FOURLENGTH, FIVELENGTH, SIXLENGTH, SEVENLENGTH, EIGHTLENGTH, NINELENGTH, TENLENGTH, ELEVENLENGTH,
+#define TIMEIS 28
+#define TIMEISLENGTH 1400
+
+#define NOTIME 29
+#define NOTIMELENGTH 6000
+
+
+#define TIMEINVALIDTRIGGERVALUE 3600000
+
+const unsigned long DelayArray [31] = {0, SOMETHINGTOSAYLENGTH, LAUGHTERLENGTH, LOVEYOULENGTH, ONELENGTH, TWOLENGTH, THREELENGTH, FOURLENGTH, FIVELENGTH, SIXLENGTH, SEVENLENGTH, EIGHTLENGTH, NINELENGTH, TENLENGTH, ELEVENLENGTH,
                                        TWELVELENGTH, THIRTEENLENGTH, THIRTEENLENGTH, FOURTEENLENGTH, FIFTEENLENGTH, SIXTEENLENGTH, SEVENTEENLENGTH, EIGHTTEENLENGTH, NINETEENLENGTH, TWENTYLENGTH, THIRTYLENGTH, FOURTYLENGTH,
-                                       FIFTYLENGTH, OCLOCKLENGTH
+                                       FIFTYLENGTH, OCLOCKLENGTH, TIMEISLENGTH, NOTIME
                                       };
 
 //Sound Play Control
@@ -143,6 +152,13 @@ const int totalSamples = totalSampleWords * 2;
 const int indexAddress = opcodeCount;
 const int bufferStart = indexAddress + 1;
 int currentSample = RTC_SLOW_MEM[indexAddress] & 0xffff;
+
+bool TimeUpdated = false;
+
+bool ValidTime = false;
+unsigned long TimeInvalid = millis() + TIMEINVALIDTRIGGERVALUE;
+bool TimeInvalidTrigger = false;
+
 
 //SoftwareSerial GPSSerial(RXPIN, TXPIN);
 TinyGPSPlus gps;
@@ -491,6 +507,24 @@ unsigned char nextSampleLeft()
         return (unsigned char)((int)OCLOCKSamples[pos++] + 128);
       }
       break;
+    case TIMEIS:
+      {
+        if (pos >= TIMEISOffsets[2])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)TIMEISSamples[pos++] + 128);
+      }
+      break;
+    case NOTIME:
+      {
+        if (pos >= NOTIMEOffsets[2])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)NOTIMESamples[pos++] + 128);
+      }
+      break;
   }
 }
 
@@ -749,6 +783,24 @@ unsigned char nextSampleRight()
         return (unsigned char)((int)OCLOCKSamples[pos++] + 128);
       }
       break;
+    case TIMEIS:
+      {
+        if (pos >= TIMEISOffsets[1])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)TIMEISSamples[pos++] + 128);
+      }
+      break;
+    case NOTIME:
+      {
+        if (pos >= NOTIMEOffsets[1])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)NOTIMESamples[pos++] + 128);
+      }
+      break;
   }
 }
 
@@ -829,50 +881,202 @@ void setup()
 
   GPSSerial.begin(GPSBAUD); //9600
 
-  PlayTrigger = true;
+}
+
+
+
+//PlayTrigger = false
+
+void loop()
+{
+  //
+  yield();
+  UpdateTime();
+
+  //Serial.println(ValidTime);
+  if (ValidTime == true)
+  {
+    TimeInvalidTrigger = false;
+    if (((gps.time.minute() == 59) && (gps.time.second() > 55))  || (Serial.available() > 0))
+    {
+      byte HourValue = gps.time.hour();
+      HourChime(HourValue);
+    }
+
+  }
+  else
+  {
+    if (TimeInvalidTrigger == false)
+    {
+      TimeInvalid = millis() + TIMEINVALIDTRIGGERVALUE;
+      TimeInvalidTrigger = true;
+    }
+    else
+    {
+      Serial.println(TimeInvalid - millis());
+      if (millis() > TimeInvalid)
+      {
+        PlayTrigger = true;
+        PlaySound(NOTIME, true);
+        TimeInvalid = millis() + TIMEINVALIDTRIGGERVALUE;
+      }
+    }
+  }
+
+
+  //  //erial.println(PrevMinute);
+  //  if (gps.time.minute() != PrevMinute)
+  //  {
+  //    TimeUpdated = false;
+  //  }
+  //
+  //  if (TimeUpdated == false)
+  //  {
+  //    HourTime = gps.time.hour();
+  //    if (HourTime == 0)
+  //    {
+  //      HourTime = 12;
+  //    }
+  //
+  //    PlayTrigger = true;
+  //    ReadNumber(HourTime);
+  //
+  //    MinuteTime = gps.time.minute();
+  //    PlayTrigger = true;
+  //    ReadNumber(MinuteTime);
+  //    TimeUpdated = true;
+  //    PrevMinute = MinuteTime;
+  //  }
+  //  char InputBuffer [20];
+  //  while (Serial.available() > 0)
+  //  {
+  //    //char(Serial.read());
+  //    strcpy(InputBuffer,char(Serial.read()));
+  //    //byte InputValue;
+  //    //InputValue = atoi(char(Serial.read()));
+  //    Serial.println(InputBuffer);
+  //byte atoi(char(Serial.read()))
+
 
 }
-byte HourTime = 0;
-byte MinuteTime = 0;
-byte PrevMinute = 0;
-bool TimeUpdated = false;
-//PlayTrigger = false
-void loop()
+
+void HourChime(byte HourValue) //Little Elmo Chimes on the hour
+{
+  PlayTrigger = true;
+  unsigned long Timer = millis() + 1000;
+  while (Timer > millis()) //Time for Elmo to standup
+  {
+    StandUp(true);
+    PlaySound(SOMETHINGTOSAY, false);
+  }
+
+  PlayTrigger = true;
+  Timer = millis() + 1000;
+  while (Timer > millis()) //Time for Elmo to standup
+  {
+    ArmUp(true);
+    PlaySound(SOMETHINGTOSAY, false);
+  }
+
+  delay(400);
+  PlayTrigger = true;
+  PlaySound(TIMEIS, true);
+
+  if (HourValue == 0)
+  {
+    ReadNumber(12);
+  }
+
+  if (HourValue > 12)
+  {
+    HourValue = HourValue - 12;
+  }
+
+  PlayTrigger = true;
+  Serial.println(HourValue);
+  ReadNumber(HourValue);
+  delay(300);
+  PlayTrigger = true;
+  PlaySound(OCLOCK, true);
+
+  
+  Timer = millis() + 3000;
+  while (Timer > millis()) //Time for Elmo to standup
+  {
+    ArmUp(false);
+  }
+
+  Texture();
+  
+  Timer = millis() + 3000;
+  while (Timer > millis()) //Time for Elmo to standup
+  {
+    StandUp(false);
+  }
+
+  
+}
+
+void Texture()
+{
+  int RandomVoice = random(1,10);
+  switch(RandomVoice)
+  {
+    case 1:
+    {
+      PlayTrigger = true;
+      PlaySound(LOVEYOU, true);
+    }
+    break;
+    case 2:
+    {
+      PlayTrigger = true;
+      PlaySound(LAUGHTER, true);
+    }
+    break;
+    default:
+    {
+      
+    }
+    break;
+  }
+}
+
+void StandUp(bool UpDown)
+{
+
+}
+
+void ArmUp(bool UpDown)
+{
+
+}
+
+void UpdateTime()
 {
   while (GPSSerial.available() > 0)
   {
     //Serial.print(char(GPSSerial.read()));
-    if (gps.encode(GPSSerial.read()))
-    {
-      displayInfo();
-    }
+    gps.encode(GPSSerial.read());
   }
-  yield();
 
-  if(gps.time.minute() != PrevMinute)
+  //Serial.println(gps.time.isValid());
+  if (gps.time.isValid() == true)
   {
-    TimeUpdated = false;
+    ValidTime = true;
   }
-  
-  if (TimeUpdated == false)
+  else
   {
-    HourTime = gps.time.hour();
-    if (HourTime == 0)
-    {
-      HourTime = 12;
-    }
-    ReadNumber(HourTime);
+    ValidTime = false;
+  }
 
-    MinuteTime = gps.time.minute();
-    ReadNumber(MinuteTime);
-    TimeUpdated = true;
-    PrevMinute = MinuteTime;
-  }
-  
+  //displayInfo();
+  //Serial.println(ValidTime);
 }
 
 void ReadNumber(byte Tminute)
 {
+  //Serial.println(Tminute);
   if (Tminute < 20)
   {
     switch (Tminute)
@@ -943,7 +1147,7 @@ void ReadNumber(byte Tminute)
         break;
       case 13:
         {
-          PlaySound(thirty, true);
+          PlaySound(thirteen, true);
         }
         break;
       case 14:
@@ -981,24 +1185,24 @@ void ReadNumber(byte Tminute)
   else
   {
     byte SubNumber = Tminute;
-    if ((Tminute > 20) && (Tminute < 30))
+    if ((Tminute > 19) && (Tminute < 30))
     {
       PlayTrigger = true;
       PlaySound(twenty, true);
       SubNumber = SubNumber - 20;
     }
-    else if ((Tminute > 30) && (Tminute < 40))
+    else if ((Tminute > 29) && (Tminute < 40))
     {
       PlayTrigger = true;
       PlaySound(thirty, true);
       SubNumber = SubNumber - 30;
     }
-    else if ((Tminute > 40) && (Tminute < 50))
+    else if ((Tminute > 39) && (Tminute < 50))
     {
       PlayTrigger = true;
       PlaySound(fourty, true);
       SubNumber = SubNumber - 40;
-    } else if ((gps.time.minute() > 50) && (Tminute < 60))
+    } else if ((Tminute > 49) && (Tminute < 60))
     {
       PlayTrigger = true;
       PlaySound(fifty, true);
