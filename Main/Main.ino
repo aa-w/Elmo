@@ -35,8 +35,11 @@
 
 */
 
-#define TXPIN 3
-#define RXPIN 2
+#define ARMHIGH 12
+#define ARMLOW 14
+#define TXPIN 17
+#define RXPIN 16
+
 #define GPSBAUD 9600
 
 //Sound Key
@@ -83,7 +86,7 @@
 #define ELEVENLENGTH 1000
 
 #define twelve 15
-#define TWELVELENGTH 1000
+#define TWELVELENGTH 900
 
 #define thirteen 16
 #define THIRTEENLENGTH 800
@@ -130,11 +133,16 @@
 #define STOPLAUGH 30
 #define STOPLAUGHLENGTH 1500
 
+#define ELMOSPICY 31
+#define ELMOSPICYLENGTH 1500
+
 #define TIMEINVALIDTRIGGERVALUE 3600000
 
-const unsigned long DelayArray [31] = {0, SOMETHINGTOSAYLENGTH, LAUGHTERLENGTH, LOVEYOULENGTH, ONELENGTH, TWOLENGTH, THREELENGTH, FOURLENGTH, FIVELENGTH, SIXLENGTH, SEVENLENGTH, EIGHTLENGTH, NINELENGTH, TENLENGTH, ELEVENLENGTH,
+#define CHIMETIMERDELAY 60000
+
+const unsigned long DelayArray [33] = {0, SOMETHINGTOSAYLENGTH, LAUGHTERLENGTH, LOVEYOULENGTH, ONELENGTH, TWOLENGTH, THREELENGTH, FOURLENGTH, FIVELENGTH, SIXLENGTH, SEVENLENGTH, EIGHTLENGTH, NINELENGTH, TENLENGTH, ELEVENLENGTH,
                                        TWELVELENGTH, THIRTEENLENGTH, THIRTEENLENGTH, FOURTEENLENGTH, FIFTEENLENGTH, SIXTEENLENGTH, SEVENTEENLENGTH, EIGHTTEENLENGTH, NINETEENLENGTH, TWENTYLENGTH, THIRTYLENGTH, FOURTYLENGTH,
-                                       FIFTYLENGTH, OCLOCKLENGTH, TIMEISLENGTH, NOTIMELENGTH, STOPLAUGHLENGTH
+                                       FIFTYLENGTH, OCLOCKLENGTH, TIMEISLENGTH, NOTIMELENGTH, STOPLAUGHLENGTH, ELMOSPICYLENGTH
                                       };
 
 //Sound Play Control
@@ -159,12 +167,12 @@ bool TimeUpdated = false;
 
 bool ValidTime = false;
 unsigned long TimeInvalid = millis() + TIMEINVALIDTRIGGERVALUE;
+unsigned long ChimeTimer = 0;
 bool TimeInvalidTrigger = false;
 
 
-//SoftwareSerial GPSSerial(RXPIN, TXPIN);
 TinyGPSPlus gps;
-SoftwareSerial GPSSerial(33, 13);
+SoftwareSerial GPSSerial(RXPIN, TXPIN);
 TaskHandle_t TaskHandle_1;
 
 void startULPSound() {
@@ -527,6 +535,24 @@ unsigned char nextSampleLeft()
         return (unsigned char)((int)NOTIMESamples[pos++] + 128);
       }
       break;
+    case STOPLAUGH:
+      {
+        if (pos >= STOPLAUGHOffsets[2])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)STOPLAUGHSamples[pos++] + 128);
+      }
+      break;
+      case ELMOSPICY:
+      {
+        if (pos >= ELMOSPICYOffsets[2])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)ELMOSPICYSamples[pos++] + 128);
+      }
+      break;
   }
 }
 
@@ -803,6 +829,24 @@ unsigned char nextSampleRight()
         return (unsigned char)((int)NOTIMESamples[pos++] + 128);
       }
       break;
+    case STOPLAUGH:
+      {
+        if (pos >= STOPLAUGHOffsets[1])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)STOPLAUGHSamples[pos++] + 128);
+      }
+      break;
+      case ELMOSPICY:
+      {
+        if (pos >= ELMOSPICYOffsets[1])
+        {
+          pos = 0;
+        }
+        return (unsigned char)((int)ELMOSPICYSamples[pos++] + 128);
+      }
+      break;
   }
 }
 
@@ -841,7 +885,7 @@ void PlaySound(byte SoundSelection, bool LoopLogic)
     dac_output_enable(DAC_CHANNEL_1);
     dac_output_enable(DAC_CHANNEL_2);
     SelectedSound = SoundSelection;
-    Serial.println(DelayArray[SoundSelection]);
+    //Serial.println(DelayArray[SoundSelection]);
     SoundTrigger = millis() + DelayArray[SoundSelection];
     xTaskCreatePinnedToCore(sound_task, "sound task", 1024 * 6, NULL, 2, NULL, 1); //Assign a new task
     //startULPSound(); //Restart the sound routine
@@ -875,6 +919,12 @@ void PlaySound(byte SoundSelection, bool LoopLogic)
 
 void setup()
 {
+  pinMode(ARMHIGH, OUTPUT);
+  pinMode(ARMLOW, OUTPUT);
+
+  digitalWrite(ARMHIGH, LOW);
+  digitalWrite(ARMLOW, LOW);
+
   Serial.begin(115200);
   Serial.println(totalSampleWords);
   Serial.print("Total stereo samples :");
@@ -899,23 +949,26 @@ void loop()
   if (ValidTime == true)
   {
     TimeInvalidTrigger = false;
-    if (((gps.time.minute() == 0) && (gps.time.second() > 2))  || (Serial.available() > 0))
+    if ((((gps.time.minute() == 0) && (gps.time.second() > 2))  || (Serial.available() > 0)) && (millis() > ChimeTimer))
     {
       byte HourValue = gps.time.hour();
+      digitalWrite(ARMHIGH, HIGH);
       HourChime(HourValue);
+      ChimeTimer = millis() + CHIMETIMERDELAY; //delay so we dont get multiple repeats
+      digitalWrite(ARMHIGH, LOW);
     }
-
   }
   else
   {
     if (TimeInvalidTrigger == false)
     {
+      Serial.println("Invalid Sound Trigger Set");
       TimeInvalid = millis() + TIMEINVALIDTRIGGERVALUE;
       TimeInvalidTrigger = true;
     }
     else
     {
-      Serial.println(TimeInvalid - millis());
+      //Serial.println(TimeInvalid - millis());
       if (millis() > TimeInvalid)
       {
         PlayTrigger = true;
@@ -936,10 +989,10 @@ void HourChime(byte HourValue) //Little Elmo Chimes on the hour
     PlaySound(SOMETHINGTOSAY, false);
   }
   PlaySound(SOMETHINGTOSAY, true);
-  
+
   PlayTrigger = true;
   Timer = millis() + 2000;
-  
+
   while (Timer > millis()) //Time for Elmo to standup
   {
     ArmUp(true);
@@ -948,7 +1001,7 @@ void HourChime(byte HourValue) //Little Elmo Chimes on the hour
   PlayTrigger = true;
   PlaySound(TIMEIS, true);
   delay(500);
-  
+
   if (HourValue == 0)
   {
     ReadNumber(12);
@@ -966,7 +1019,7 @@ void HourChime(byte HourValue) //Little Elmo Chimes on the hour
   PlayTrigger = true;
   PlaySound(OCLOCK, true);
 
-  
+
   Timer = millis() + 2000;
   while (Timer > millis()) //Time for Elmo to standup
   {
@@ -974,40 +1027,40 @@ void HourChime(byte HourValue) //Little Elmo Chimes on the hour
   }
 
   Texture();
-  
+
   Timer = millis() + 2000;
   while (Timer > millis()) //Time for Elmo to standup
   {
     StandUp(false);
-  }  
+  }
 }
 
 void Texture()
 {
-  int RandomVoice = random(1,10);
-  switch(RandomVoice)
+  int RandomVoice = random(1, 10);
+  switch (RandomVoice)
   {
     case 1:
-    {
-      PlayTrigger = true;
-      PlaySound(LOVEYOU, true);
-    }
-    break;
+      {
+        PlayTrigger = true;
+        PlaySound(LOVEYOU, true);
+      }
+      break;
     case 2:
-    {
-      PlayTrigger = true;
-      PlaySound(LAUGHTER, true);
-    }
-    break;
+      {
+        PlayTrigger = true;
+        PlaySound(LAUGHTER, true);
+      }
+      break;
     default:
-    {
-      
-    }
-    break;
+      {
+
+      }
+      break;
   }
 }
 
-void StandUp(bool UpDown) 
+void StandUp(bool UpDown)
 {
 
 }
@@ -1035,7 +1088,14 @@ void UpdateTime()
     ValidTime = false;
   }
 
-  //displayInfo();
+
+
+  int CurrentSecond = ((millis() / 1000U) % 10); //Gets the seconds in millis
+  CurrentSecond = CurrentSecond % 2;
+  if (CurrentSecond == 0)
+  {
+    displayInfo();
+  }
   //Serial.println(ValidTime);
 }
 
